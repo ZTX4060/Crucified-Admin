@@ -114,7 +114,7 @@
     <script>
         // الحماية: التحقق من تسجيل الدخول قبل فتح الصفحة
         if (sessionStorage.getItem("adminLoggedIn") !== "true") {
-            window.location.href = "admin-login.html";
+            window.location.href = "index-login.html";
         }
     </script>
 
@@ -191,7 +191,7 @@
 
         window.logout = function() {
             sessionStorage.removeItem("adminLoggedIn");
-            window.location.href = "admin-login.html";
+            window.location.href = "index-login.html";
         }
 
         window.switchTab = function(tabName) {
