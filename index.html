@@ -124,21 +124,18 @@
     </nav>
 
     <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('staff')"><i class="fa-solid fa-user-shield"></i> Staff Applications</button>
-            <button class="tab-btn" onclick="switchTab('ally')"><i class="fa-solid fa-handshake"></i> Ally Requests</button>
-            <button class="tab-btn" onclick="switchTab('reports')"><i class="fa-solid fa-flag"></i> Reports</button>
-        </div>
-
-        <div id="tab-staff" class="content-section active">
-            <div id="staff-list" class="empty-state">No staff applications submitted yet.</div>
-        </div>
-
-        <div id="tab-ally" class="content-section">
-            <div id="ally-list" class="empty-state">No alliance requests submitted yet.</div>
-        </div>
-
-        <div id="tab-reports" class="content-section">
+        <!-- وضع هذا الكود داخل الـ <body> في المكان المخصص للـ Tabs -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('staff', 'staff_applications', 'staff-list')">
+        <i class="fa-solid fa-user-shield"></i> Staff Applications
+    </button>
+    <button class="tab-btn" onclick="switchTab('ally', 'allies', 'ally-list')">
+        <i class="fa-solid fa-handshake"></i> Ally Requests
+    </button>
+    <button class="tab-btn" onclick="switchTab('reports', 'reports', 'reports-list')">
+        <i class="fa-solid fa-flag"></i> Reports
+    </button>
+</div>
             <div id="reports-list" class="empty-state">No reports submitted yet.</div>
         </div>
     </div>
