@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Crucified Clan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-light: #f4f5f7;
+            --text-dark: #111111;
+            --text-muted: #6c757d;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --danger-red: #ef4444;
+            --success-green: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 4rem;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .brand-name { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+
+        .logout-btn {
+            text-decoration: none;
+            color: var(--danger-red);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container { max-width: 1100px; width: 100%; margin: 2rem auto; padding: 0 1.5rem; }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            color: var(--text-dark);
+            border-bottom: 3px solid var(--text-dark);
+        }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .data-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-red);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        // الحماية: التحقق من تسجيل الدخول قبل فتح الصفحة
+        if (sessionStorage.getItem("adminLoggedIn") !== "true") {
+            window.location.href = "admin-login.html";
+        }
+    </script>
+
+    <nav>
+        <div class="brand-name">Crucified Admin</div>
+        <a onclick="logout()" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('staff')"><i class="fa-solid fa-user-shield"></i> Staff Applications</button>
+            <button class="tab-btn" onclick="switchTab('ally')"><i class="fa-solid fa-handshake"></i> Ally Requests</button>
+            <button class="tab-btn" onclick="switchTab('reports')"><i class="fa-solid fa-flag"></i> Reports</button>
+        </div>
+
+        <div id="tab-staff" class="content-section active">
+            <div id="staff-list" class="empty-state">No staff applications submitted yet.</div>
+        </div>
+
+        <div id="tab-ally" class="content-section">
+            <div id="ally-list" class="empty-state">No alliance requests submitted yet.</div>
+        </div>
+
+        <div id="tab-reports" class="content-section">
+            <div id="reports-list" class="empty-state">No reports submitted yet.</div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ضع إعدادات Firebase الخاصة بمشروعك هنا
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // جلب البيانات الحقيقية فقط من Firebase
+        async function loadData(collectionName, containerId) {
+            const container = document.getElementById(containerId);
+            try {
+                const querySnapshot = await getDocs(collection(db, collectionName));
+                if(querySnapshot.empty) {
+                    container.innerHTML = `<div class="empty-state">No entries found.</div>`;
+                    return;
+                }
+                container.innerHTML = "";
+                querySnapshot.forEach((docSnapshot) => {
+                    const data = docSnapshot.data();
+                    const card = document.createElement('div');
+                    card.className = 'data-card';
+                    card.innerHTML = `
+                        <div>
+                            <h4>${data.title || data.ign || 'Entry'}</h4>
+                            <p>${JSON.stringify(data)}</p>
+                        </div>
+                        <button class="btn-delete" onclick="deleteEntry('${collectionName}', '${docSnapshot.id}')">Delete</button>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.log("Firebase not configured yet or empty data.");
+            }
+        }
+
+        window.logout = function() {
+            sessionStorage.removeItem("adminLoggedIn");
+            window.location.href = "admin-login.html";
+        }
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
