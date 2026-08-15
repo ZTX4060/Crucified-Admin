@@ -112,9 +112,18 @@
             align-items: center;
             gap: 0.3rem;
         }
+
+        .proof-link { color: #2563eb; text-decoration: underline; font-weight: 600; }
     </style>
 </head>
 <body>
+
+    <script>
+        // الحماية: التوجيه لصفحة التسجيل index-login.html إذا لم يسجل الدخول
+        if (sessionStorage.getItem("adminLoggedIn") !== "true") {
+            window.location.href = "index-login.html";
+        }
+    </script>
 
     <nav>
         <div class="brand-name">CRUCIFIED ADMIN</div>
@@ -122,7 +131,6 @@
     </nav>
 
     <div class="container">
-        <!-- أزرار التبويبات -->
         <div class="tabs">
             <button id="btn-staff" class="tab-btn active" onclick="switchTab('staff', 'staff_applications', 'staff-list')">
                 <i class="fa-solid fa-user-shield"></i> Staff Applications
@@ -135,7 +143,6 @@
             </button>
         </div>
 
-        <!-- الأقسام المتغيرة -->
         <div id="tab-staff" class="content-section active">
             <div id="staff-list" class="empty-state">Loading staff applications...</div>
         </div>
@@ -149,25 +156,22 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ضع إعدادات مشروعك الحقيقية هنا
         const firebaseConfig = {
-apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
-  authDomain: "crucified-ffaba.firebaseapp.com",
-  projectId: "crucified-ffaba",
-  storageBucket: "crucified-ffaba.firebasestorage.app",
-  messagingSenderId: "806679367461",
-  appId: "1:806679367461:web:c4c24f0f3fe7eec2aad4cc",
+            apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
+            authDomain: "crucified-ffaba.firebaseapp.com",
+            projectId: "crucified-ffaba",
+            storageBucket: "crucified-ffaba.firebasestorage.app",
+            messagingSenderId: "806679367461",
+            appId: "1:806679367461:web:c4c24f0f3fe7eec2aad4cc"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // دالة جلب البيانات من Firebase
         window.loadData = async function(collectionName, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Fetching data from Firebase...</div>`;
@@ -176,7 +180,7 @@ apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
                 const querySnapshot = await getDocs(collection(db, collectionName));
                 
                 if (querySnapshot.empty) {
-                    container.innerHTML = `<div class="empty-state">No entries found in ${collectionName}.</div>`;
+                    container.innerHTML = `<div class="empty-state">No entries found.</div>`;
                     return;
                 }
 
@@ -192,7 +196,7 @@ apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
                     } else if (collectionName === 'allies') {
                         details = `<strong>Leader IGN:</strong> ${data.leaderIgn || 'N/A'} | <strong>Clan Name:</strong> ${data.clanName || 'N/A'}`;
                     } else if (collectionName === 'reports') {
-                        details = `<strong>Reported Player:</strong> ${data.reportedPlayer || 'N/A'} | <strong>Reason:</strong> ${data.reason || 'N/A'}<br><small><strong>Proof:</strong> ${data.proof || 'N/A'}</small>`;
+                        details = `<strong>Reported Player:</strong> ${data.reportedPlayer || 'N/A'} | <strong>Reason:</strong> ${data.reason || 'N/A'}<br><small><strong>Proof:</strong> <a href="${data.proof}" target="_blank" class="proof-link">View Proof</a></small>`;
                     }
 
                     card.innerHTML = `
@@ -205,7 +209,7 @@ apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
                 });
             } catch (error) {
                 console.error(error);
-                container.innerHTML = `<div class="empty-state" style="color:red;">Error loading data. Check Developer Console (F12).</div>`;
+                container.innerHTML = `<div class="empty-state" style="color:red;">Error loading data. Check Firebase Rules!</div>`;
             }
         };
 
@@ -232,10 +236,9 @@ apiKey: "AIzaSyAEFhmLavb9_xQknUDLYb04EQFlB-19PA4",
 
         window.logout = function() {
             sessionStorage.removeItem("adminLoggedIn");
-            window.location.href = "admin-login.html";
+            window.location.href = "index-login.html";
         };
 
-        // تحميل بيانات Staff تلقائياً فور فتح الصفحة
         document.addEventListener("DOMContentLoaded", () => {
             window.loadData('staff_applications', 'staff-list');
         });
