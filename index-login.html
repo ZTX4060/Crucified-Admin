@@ -96,9 +96,7 @@
             margin-top: 0.5rem;
         }
 
-        .btn-submit:hover {
-            background-color: var(--text-muted);
-        }
+        .btn-submit:hover { background-color: var(--text-muted); }
 
         .error-msg {
             color: var(--error-red);
@@ -135,7 +133,6 @@
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
 
-            // التحقق من الحساب المحدد بالضبط
             if (user === "crucifiedforever11" && pass === "crucifiedforeveradminpanel") {
                 sessionStorage.setItem("adminLoggedIn", "true");
                 window.location.href = 'index.html';
