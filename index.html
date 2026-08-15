@@ -114,6 +114,31 @@
         }
 
         .proof-link { color: #2563eb; text-decoration: underline; font-weight: 600; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .brand-name { font-size: 1.3rem; }
+            .logout-btn { font-size: 0.9rem; }
+            .container { margin: 1.2rem auto; padding: 0 1rem; }
+            .tabs { gap: 0.4rem; flex-wrap: wrap; }
+            .tab-btn { font-size: 0.85rem; padding: 0.5rem 0.6rem; gap: 0.35rem; }
+            .data-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+                padding: 1.2rem;
+            }
+            .data-card > div { font-size: 0.9rem; word-break: break-word; }
+            .btn-delete { align-self: flex-end; }
+        }
+
+        @media (max-width: 420px) {
+            .brand-name { font-size: 1.05rem; letter-spacing: 1px; }
+            .tab-btn { font-size: 0.78rem; padding: 0.45rem 0.5rem; }
+            .logout-btn { font-size: 0.82rem; }
+            .empty-state { padding: 2rem 1rem; }
+        }
     </style>
 </head>
 <body>
